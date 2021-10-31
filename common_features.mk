@@ -208,7 +208,7 @@ ifeq ($(strip $(LED_MATRIX_ENABLE)), yes)
 endif
 
 RGB_MATRIX_ENABLE ?= no
-VALID_RGB_MATRIX_TYPES := IS31FL3731 IS31FL3733 IS31FL3737 IS31FL3741 WS2812 SN32F248B custom
+VALID_RGB_MATRIX_TYPES := IS31FL3731 IS31FL3733 IS31FL3737 IS31FL3741 WS2812 SN32F24xx custom
 
 ifeq ($(strip $(RGB_MATRIX_ENABLE)), yes)
     ifeq ($(filter $(RGB_MATRIX_DRIVER),$(VALID_RGB_MATRIX_TYPES)),)
@@ -221,7 +221,7 @@ ifneq (,$(filter $(MCU), atmega16u2 atmega32u2))
 endif
     SRC += $(QUANTUM_DIR)/color.c
     SRC += $(QUANTUM_DIR)/rgb_matrix.c
-    ifneq ($(strip $(RGB_MATRIX_DRIVER)), SN32F248B)
+    ifneq ($(strip $(RGB_MATRIX_DRIVER)), SN32F24xx)
         SRC += $(QUANTUM_DIR)/rgb_matrix_drivers.c
     endif
     CIE1931_CURVE := yes
@@ -260,9 +260,9 @@ endif
         WS2812_DRIVER_REQUIRED := yes
     endif
 
-    ifeq ($(strip $(RGB_MATRIX_DRIVER)), SN32F248B)
+    ifeq ($(strip $(RGB_MATRIX_DRIVER)), SN32F24xx)
         COMMON_VPATH += $(DRIVER_PATH)/sn32
-        SRC += rgb_matrix_sn32f248b.c
+        SRC += rgb_matrix_sn32f24xx.c
     endif    
 
     ifeq ($(strip $(RGB_MATRIX_CUSTOM_KB)), yes)
