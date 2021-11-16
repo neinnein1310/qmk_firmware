@@ -40,6 +40,7 @@ enum layer_keycodes {
   
     //Custom led effect keycode
     RGB_C_E,             //Cycle user effect
+    OPENRGB,             //Openrgb direct mode
 };
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -177,6 +178,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                         return false;
                 }
             }
+            return false;
+        case OPENRGB:
+            rgb_matrix_mode(RGB_MATRIX_OPENRGB_DIRECT);
             return false;
 	    }
     return true;
