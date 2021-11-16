@@ -23,9 +23,9 @@ KEYBOARD_SHARED_EP = yes
 
 # Custom matrix handling
 CUSTOM_MATRIX = yes
-SRC = ../../../drivers/sn32/matrix_sn32f248b.c
+SRC = ../../../drivers/sn32/matrix_sn32f24xx.c
 
 # Custom RGB matrix handling
 RGB_MATRIX_ENABLE = yes
-RGB_MATRIX_DRIVER = SN32F24xx
+RGB_MATRIX_DRIVER = SN32F248B_PWM
 SRC += config_led.c

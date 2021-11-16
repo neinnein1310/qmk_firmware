@@ -38,6 +38,19 @@
  */
 
 /*
+ * CT driver system settings.
+ */
+#define SN32_HAS_CT16B0 TRUE
+#define SN32_HAS_CT16B1 TRUE
+
+/*
+ * PWM driver system settings.
+ */
+#define HAL_USE_PWM TRUE
+#define SN32_PWM_USE_CT16B1 TRUE
+#define SN32_PWM_USE_ONESHOT TRUE
+
+/*
  * SN driver system settings.
  */
 #define SN32_HAS_GPIOA TRUE
@@ -56,7 +69,7 @@
  */
 #define SYS_CLOCK_SETUP 1
 #define SYS0_CLKCFG_VAL 0
-#define AHB_PRESCALAR 0x2
+#define AHB_PRESCALAR 0x0
 #define CLKOUT_SEL_VAL 0x0
 #define CLKOUT_PRESCALAR 0x0
 
