@@ -16,6 +16,7 @@
 
 #include QMK_KEYBOARD_H
 
+// OLED animation
 #include "lib/wave.c"
 #include "lib/logo.c"
 
@@ -242,26 +243,26 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     static void render_layer_info(void) {
         switch (get_highest_layer(layer_state)) {
             case 0:
-                oled_write_P(PSTR("QWERTY "), false);
+                oled_write_P(PSTR("QWERTY       "), false);
                 break;
             case 1:
-                oled_write_P(PSTR("Function "), false);
+                oled_write_P(PSTR("Function     "), false);
                 break;
             case 2:
-                oled_write_P(PSTR("Function "), false);
+                oled_write_P(PSTR("Function     "), false);
                 break;
             case 3:
-                oled_write_P(PSTR("Function "), false);
+                oled_write_P(PSTR("Function     "), false);
                 break;
             default:
-                oled_write_P(PSTR("Undefined "), false);
+                oled_write_P(PSTR("Undefined    "), false);
         }
     }
 
     static void render_layer_number(void) {
         switch (get_highest_layer(layer_state)) {
             case 0:
-                oled_write_P(PSTR("0  "), false);
+                oled_write_P(PSTR("0"), false);
                 break;
             case 1:
                 oled_write_P(PSTR("1"), false);
@@ -273,7 +274,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 oled_write_P(PSTR("3"), false);
                 break;
             default:
-                oled_write_P(PSTR("X  "), false);
+                oled_write_P(PSTR("X"), false);
         }
     }
 
@@ -288,7 +289,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             led_t led_usb_state = host_keyboard_led_state();
 
             oled_write_P(led_usb_state.caps_lock ? PSTR("CAPLK ") : PSTR("----- "), false);
-            oled_write_P(led_usb_state.num_lock ? PSTR(" NUMLK ") : PSTR(" ----- "), false);
+            oled_write_P(PSTR(" GOPOLAR "), false);
             oled_write_P(led_usb_state.scroll_lock ? PSTR(" SCRLK") : PSTR(" -----"), false);
 
             // sleep if it has been long enough since we last got a char

@@ -1,3 +1,19 @@
+/* Copyright 2021 HorrorTroll <https://github.com/HorrorTroll>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "oled/oled_stuff.h"
 
 // Each layer gets a name for readability, which is then used in the keymap matrix below.
@@ -83,6 +99,8 @@ void keyboard_post_init_kb(void) {
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    process_record_user_oled(keycode, record);
+
     uint8_t color_adj_step = 5;
 
     CUSTOM_PRESETS gradient_presets[] = {
@@ -254,7 +272,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 }
 
 void rgb_matrix_indicators_user(void) {
-    switch (biton32(layer_state)) {
+    switch (get_highest_layer(layer_state)) {
         case _FN:
             rgb_matrix_set_color( 0, 0, 0, 0); rgb_matrix_set_color( 1, 0, 0, 0); rgb_matrix_set_color( 2, 0, 0, 0); rgb_matrix_set_color( 3, 0, 0, 0);
             rgb_matrix_set_color( 4, 0, 0, 0); rgb_matrix_set_color( 5, 0, 0, 0); rgb_matrix_set_color( 6, 0, 0, 0); rgb_matrix_set_color(11, 0, 0, 0);

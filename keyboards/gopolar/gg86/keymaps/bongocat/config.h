@@ -30,9 +30,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define USB_POLLING_INTERVAL_MS 1
 #define QMK_KEYS_PER_SCAN 12
 
-/* Use the custom font */
-#define OLED_FONT_H "lib/glcdfont.c"
-
 #ifdef RGB_MATRIX_ENABLE
     #undef RGB_MATRIX_KEYPRESSES
 
@@ -48,14 +45,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     #undef ENABLE_RGB_MATRIX_BAND_SPIRAL_SAT
     #undef ENABLE_RGB_MATRIX_BAND_SPIRAL_VAL
     #undef ENABLE_RGB_MATRIX_RAINBOW_MOVING_CHEVRON
-    #undef ENABLE_RGB_MATRIX_CYCLE_OUT_IN_DUAL
-    #undef ENABLE_RGB_MATRIX_CYCLE_PINWHEEL
-    #undef ENABLE_RGB_MATRIX_RAINBOW_BEACON
-    #undef ENABLE_RGB_MATRIX_RAINBOW_PINWHEELS
     #undef ENABLE_RGB_MATRIX_RAINDROPS
     #undef ENABLE_RGB_MATRIX_JELLYBEAN_RAINDROPS
     #undef ENABLE_RGB_MATRIX_HUE_PENDULUM
     #undef ENABLE_RGB_MATRIX_HUE_WAVE
-    #undef ENABLE_RGB_MATRIX_PIXEL_FRACTAL
     #undef ENABLE_RGB_MATRIX_PIXEL_RAIN
 #endif

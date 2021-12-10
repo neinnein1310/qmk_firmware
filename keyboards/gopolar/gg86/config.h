@@ -45,6 +45,9 @@
 /* RGB Matrix config */
 #define RGB_DI_PIN E2
 
+/* Use the custom font */
+#define OLED_FONT_H "lib/glcdfont.c"
+
 #ifdef RGB_MATRIX_ENABLE
     #define DRIVER_LED_TOTAL 100
     #define RGB_MATRIX_MAXIMUM_BRIGHTNESS 200

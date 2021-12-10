@@ -15,12 +15,10 @@
  */
 
 #include QMK_KEYBOARD_H
-#include <stdio.h>
 
 // OLED animation
+#include "lib/logo.c"
 #include "oled/bongocat.c"
-
-char wpm_str[10];
 
 // Each layer gets a name for readability, which is then used in the keymap matrix below.
 // The underscores don't mean anything - you can have a layer called STUFF or any other name.
@@ -110,17 +108,25 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     }
 
     bool oled_task_user(void) {
-        led_t led_usb_state = host_keyboard_led_state();
+        static bool finished_logo = false;
 
-        render_bongocat();
-        oled_set_cursor(14, 0);                           // sets cursor to (column, row) using charactar spacing (4 rows on 128x32 screen, anything more will overflow back to the top)
-        sprintf(wpm_str, "WPM:%03d", get_current_wpm());  // edit the string to change wwhat shows up, edit %03d to change how many digits show up
-        oled_write(wpm_str, false);                       // writes wpm on top right corner of string
-        oled_set_cursor(17, 2);
-        oled_write_P(led_usb_state.caps_lock ? PSTR("CAPS") : PSTR("    "), false);
-        oled_set_cursor(17, 3);
-        oled_write_P(led_usb_state.scroll_lock ? PSTR("SCRL") : PSTR("    "), false);
-	
+        if ((timer_elapsed(startup_timer) < 5000) && !finished_logo) {
+            render_logo();
+        } else {
+            finished_logo = true;
+
+            led_t led_usb_state = host_keyboard_led_state();
+
+            render_bongocat();
+            oled_set_cursor(14, 0);                                // sets cursor to (column, row) using charactar spacing (4 rows on 128x32 screen, anything more will overflow back to the top)
+            oled_write_P(PSTR("WPM:"), false);
+            oled_write(get_u8_str(get_current_wpm(), '0'), false); // writes wpm on top right corner of string
+            oled_set_cursor(17, 2);
+            oled_write_P(led_usb_state.caps_lock ? PSTR("CAPS") : PSTR("    "), false);
+            oled_set_cursor(17, 3);
+            oled_write_P(led_usb_state.scroll_lock ? PSTR("SCRL") : PSTR("    "), false);
+        }
+
         return true;
     }
 #endif
