@@ -81,10 +81,6 @@ bool process_record_user_oled(uint16_t keycode, keyrecord_t *record) {
     return true;
 }
 
-void render_layer_name(void) {
-    oled_write_P(PSTR("LAYER: WAVE"), false);
-}
-
 void render_frame(void) {
     // rotate line 1, and stick in the next byte of the next char,
     // then rotate the next char buffer

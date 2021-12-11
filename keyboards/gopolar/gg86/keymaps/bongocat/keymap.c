@@ -17,7 +17,6 @@
 #include QMK_KEYBOARD_H
 
 // OLED animation
-#include "lib/logo.c"
 #include "oled/bongocat.c"
 
 // Each layer gets a name for readability, which is then used in the keymap matrix below.
@@ -28,6 +27,22 @@
 // enum layer_names { };
 
 // enum layer_keycodes { };
+
+enum user_rgb_mode {
+    RGB_MODE_ALL,
+    RGB_MODE_KEYLIGHT,
+    RGB_MODE_UNDERGLOW,
+    RGB_MODE_NONE,
+};
+
+typedef union {
+    uint32_t raw;
+    struct {
+        uint8_t rgb_mode :8;
+    };
+} user_config_t;
+
+user_config_t user_config;
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
@@ -98,34 +113,78 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 };
 
-#ifdef OLED_ENABLE
-    uint16_t startup_timer; 
-
-    oled_rotation_t oled_init_user(oled_rotation_t rotation) {
-        startup_timer = timer_read();
-
-        return rotation;
+void keyboard_post_init_kb(void) {
+    user_config.raw = eeconfig_read_user();
+    switch (user_config.rgb_mode) {
+        case RGB_MODE_ALL:
+            rgb_matrix_set_flags(LED_FLAG_ALL);
+            rgb_matrix_enable_noeeprom();
+            break;
+        case RGB_MODE_KEYLIGHT:
+            rgb_matrix_set_flags(LED_FLAG_KEYLIGHT);
+            rgb_matrix_set_color_all(0, 0, 0);
+            break;
+        case RGB_MODE_UNDERGLOW:
+            rgb_matrix_set_flags(LED_FLAG_UNDERGLOW);
+            rgb_matrix_set_color_all(0, 0, 0);
+            break;
+        case RGB_MODE_NONE:
+            rgb_matrix_set_flags(LED_FLAG_NONE);
+            rgb_matrix_disable_noeeprom();
+            break;
     }
+}
 
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case RGB_TOG:
+            if (record->event.pressed) {
+                switch (rgb_matrix_get_flags()) {
+                    case LED_FLAG_ALL: {
+                        rgb_matrix_set_flags(LED_FLAG_KEYLIGHT | LED_FLAG_MODIFIER | LED_FLAG_INDICATOR);
+                        rgb_matrix_set_color_all(0, 0, 0);
+                        user_config.rgb_mode = RGB_MODE_KEYLIGHT;
+                    }
+                    break;
+                    case (LED_FLAG_KEYLIGHT | LED_FLAG_MODIFIER | LED_FLAG_INDICATOR): {
+                        rgb_matrix_set_flags(LED_FLAG_UNDERGLOW);
+                        rgb_matrix_set_color_all(0, 0, 0);
+                        user_config.rgb_mode = RGB_MODE_UNDERGLOW;
+                    }
+                    break;
+                    case (LED_FLAG_UNDERGLOW): {
+                        rgb_matrix_set_flags(LED_FLAG_NONE);
+                        rgb_matrix_disable_noeeprom();
+                        user_config.rgb_mode = RGB_MODE_NONE;
+                    }
+                    break;
+                    default: {
+                        rgb_matrix_set_flags(LED_FLAG_ALL);
+                        rgb_matrix_enable_noeeprom();
+                        user_config.rgb_mode = RGB_MODE_ALL;
+                    }
+                    break;
+                }
+                eeconfig_update_user(user_config.raw);
+            }
+            return false;
+	}
+
+    return true;
+}
+
+#ifdef OLED_ENABLE
     bool oled_task_user(void) {
-        static bool finished_logo = false;
+        led_t led_usb_state = host_keyboard_led_state();
 
-        if ((timer_elapsed(startup_timer) < 5000) && !finished_logo) {
-            render_logo();
-        } else {
-            finished_logo = true;
-
-            led_t led_usb_state = host_keyboard_led_state();
-
-            render_bongocat();
-            oled_set_cursor(14, 0);                                // sets cursor to (column, row) using charactar spacing (4 rows on 128x32 screen, anything more will overflow back to the top)
-            oled_write_P(PSTR("WPM:"), false);
-            oled_write(get_u8_str(get_current_wpm(), '0'), false); // writes wpm on top right corner of string
-            oled_set_cursor(17, 2);
-            oled_write_P(led_usb_state.caps_lock ? PSTR("CAPS") : PSTR("    "), false);
-            oled_set_cursor(17, 3);
-            oled_write_P(led_usb_state.scroll_lock ? PSTR("SCRL") : PSTR("    "), false);
-        }
+        render_bongocat();
+        oled_set_cursor(14, 0);                                // sets cursor to (column, row) using charactar spacing (4 rows on 128x32 screen, anything more will overflow back to the top)
+        oled_write_P(PSTR("WPM:"), false);
+        oled_write(get_u8_str(get_current_wpm(), '0'), false); // writes wpm on top right corner of string
+        oled_set_cursor(17, 2);
+        oled_write_P(led_usb_state.caps_lock ? PSTR("CAPS") : PSTR("    "), false);
+        oled_set_cursor(17, 3);
+        oled_write_P(led_usb_state.scroll_lock ? PSTR("SCRL") : PSTR("    "), false);
 
         return true;
     }

@@ -16,6 +16,9 @@
 
 #include "gg86.h"
 
+// OLED animation
+#include "lib/logo.c"
+
 #ifdef RGB_MATRIX_ENABLE
 led_config_t g_led_config = { {
     { 87,     86,     85,     84,     83,     82,     81,     80,     79,     78,     77,     76,     75, NO_LED,     74,     73,     72 },
@@ -47,4 +50,30 @@ led_config_t g_led_config = { {
     // Underglow (88 -> 99)
     2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2
 } };
+#endif
+
+#ifdef OLED_ENABLE
+    uint16_t startup_timer; 
+
+    oled_rotation_t oled_init_kb(oled_rotation_t rotation) {
+        startup_timer = timer_read();
+
+        return rotation;
+    }
+
+    bool oled_task_kb(void) {
+        static bool finished_logo = false;
+
+        if ((timer_elapsed(startup_timer) < 5000) && !finished_logo) {
+            render_logo();
+        } else {
+            finished_logo = true;
+			
+            if (!oled_task_user()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 #endif

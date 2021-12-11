@@ -16,17 +16,8 @@
 
 // OLED animation
 #include "lib/wave.c"
-#include "lib/logo.c"
 
 #ifdef OLED_ENABLE
-    uint16_t startup_timer; 
-
-    oled_rotation_t oled_init_user(oled_rotation_t rotation) {
-        startup_timer = timer_read();
-
-        return rotation;
-    }
-
     static void render_layer_info(void) {
         switch (get_highest_layer(layer_state)) {
             case 0:
@@ -54,35 +45,23 @@
     }
 
     bool oled_task_user(void) {
-        static bool finished_logo = false;
+        render_layer_info();
 
-        if ((timer_elapsed(startup_timer) < 5000) && !finished_logo) {
-            render_logo();
+        // sleep if it has been long enough since we last got a char
+        if (timer_elapsed32(wave_sleep) > OLED_TIMEOUT) {
+            oled_off();
         } else {
-            finished_logo = true;
-
-            led_t led_usb_state = host_keyboard_led_state();
-
-            render_layer_info();
-
-            // sleep if it has been long enough since we last got a char
-            if (timer_elapsed32(wave_sleep) > OLED_TIMEOUT) {
-                oled_off();
-            } else {
-                oled_on();
-            }
-            // time for the next frame?
-            if (timer_elapsed(wave_timer) > FRAME_TIMEOUT) {
-                wave_timer = timer_read();
-                render_frame();
-            }
-
-            oled_set_cursor(0, 3);
-            oled_write_P(led_usb_state.caps_lock ? PSTR("Caps  ") : PSTR("      "), false);
-            oled_write_P(PSTR("Layer: "), false);
-            render_layer_number();
-            oled_write_P(led_usb_state.scroll_lock ? PSTR(" Scroll") : PSTR("       "), false);
+            oled_on();
         }
+        // time for the next frame?
+        if (timer_elapsed(wave_timer) > FRAME_TIMEOUT) {
+            wave_timer = timer_read();
+            render_frame();
+        }
+
+        oled_set_cursor(0, 3);
+        oled_write_P(PSTR("      Layer: "), false);
+        render_layer_number();
 
         return true;
     }
