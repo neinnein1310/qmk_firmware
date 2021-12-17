@@ -37,6 +37,7 @@ static uint16_t row_ofsts[LED_MATRIX_ROWS];
 static uint8_t mr_offset[24] = {0};
 static uint8_t current_row = 0;
 LED_TYPE led_state[LED_MATRIX_ROWS * LED_MATRIX_COLS];
+LED_TYPE new_led_state[LED_MATRIX_ROWS * LED_MATRIX_COLS];
 uint8_t led_pos[DRIVER_LED_TOTAL];
 extern matrix_row_t raw_matrix[MATRIX_ROWS]; //raw values
 static const pin_t led_row_pins[LED_MATRIX_ROWS_HW] = LED_MATRIX_ROW_PINS;
@@ -352,13 +353,16 @@ void SN32F24XX_init(void) {
     shared_matrix_rgb_enable();
 }
 
-static void flush(void) {}
+void SN32F24XX_flush(void) {
+    for (int i = 0; i < LED_MATRIX_ROWS * LED_MATRIX_COLS; i++)
+        led_state[i] = new_led_state[i];
+}
 
 void SN32F24XX_set_color(int index, uint8_t r, uint8_t g, uint8_t b) {
     int corrected_index = led_pos[index];
-    led_state[corrected_index].r = r;
-    led_state[corrected_index].g = g;
-    led_state[corrected_index].b = b;
+    new_led_state[corrected_index].r = r;
+    new_led_state[corrected_index].g = g;
+    new_led_state[corrected_index].b = b;
 }
 
 void SN32F24XX_set_color_all(uint8_t r, uint8_t g, uint8_t b) {
@@ -368,7 +372,7 @@ void SN32F24XX_set_color_all(uint8_t r, uint8_t g, uint8_t b) {
 
 const rgb_matrix_driver_t rgb_matrix_driver = {
     .init          = SN32F24XX_init,
-    .flush         = flush,
+    .flush         = SN32F24XX_flush,
     .set_color     = SN32F24XX_set_color,
     .set_color_all = SN32F24XX_set_color_all,
 };
